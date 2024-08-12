@@ -6,7 +6,7 @@ from distance_calculation import DistanceCalculation
 from sklearn.metrics import pairwise_distances
 
 def resolve_lost_tracks(
-    lost_tracks_prev: dict, lost_tracks_next: dict, metric: str = "hanhattan"
+    lost_tracks_prev: dict, lost_tracks_next: dict, metric: str = "manhattan"
 ):
     prev_id_to_next_id = dict()
 

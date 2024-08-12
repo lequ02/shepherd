@@ -2,13 +2,6 @@
 
 Monitoring Farm Sheep Movement with Deep Learning and Object Tracking
 
-## Team Members
-**Advisor:** Dr. Do Thuy
-1. Adam Koller (Team Lead)
-2. Emma Tran
-3. Luc Vuong
-4. Minh Le
-5. Nicholas Drew
 
 ## Installation
 
