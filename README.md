@@ -7,7 +7,11 @@ SHEPHERD is the AI Livestock Health Monitoring System that helps local farmers i
 SHEPHERD also won 1st place in a Regional AI Innovation Competition. 
 
 ## DEMO
-> [![Product demo](https://raw.githubusercontent.com/lequ02/shepherd/main/media/product_demo.mp4)]
+https://github.com/user-attachments/assets/e6af79cf-8b9d-49b5-b155-b47297b31396
+
+
+https://github.com/user-attachments/assets/2498d61e-3aa9-4abe-9950-67f65498135b
+
 
 
 
@@ -15,17 +19,23 @@ SHEPHERD also won 1st place in a Regional AI Innovation Competition.
 
 HOW TO RECREATE TRACKING VIDEO:
 
-	step1:
-augment 30s video using augmentation2.py
+step1:
 
-	step2:
-run obj tracking YOLO (tracking_yolo.py) on augmented video and save the results in txt files
+    augment 30s video using augmentation2.py
 
-	step3:
-change the format of result txts from xywhn to xyxy using convert_format.py
+step2:
 
-	step4:
-correct the IDs that were lost track during the process using id_correcting2.py
+    run obj tracking YOLO (tracking_yolo.py) on augmented video and save the results in txt files
 
-	step5:
-draw the new bounding boxes using drawingboxes.py
+step3:
+
+	change the format of result txts from xywhn to xyxy using convert_format.py
+
+step4:
+
+	correct the IDs that were lost track during the process using id_correcting2.py
+
+step5:
+
+	draw the new bounding boxes using drawingboxes.py
+
