@@ -5,10 +5,10 @@ import os
 video_file = "output_video4.mp4"
 
 # Directory containing the text files with bounding box coordinates
-txt_directory = "result\\track6 - Copy\\reID"
+txt_directory = "result\\track8\\reID"
 
 # Output directory for the new video with bounding boxes
-output_video = "output_with_bboxes.mp4"
+output_video = "output_with_bboxes_8.mp4"
 
 # Read the video file
 cap = cv2.VideoCapture(video_file)

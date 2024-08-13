@@ -18,7 +18,7 @@ def convert_xywhn_to_xyxy(file_path, img_width=640, img_height=640):
             f.write(f"{parts[0]} {x1:.6f} {y1:.6f} {x2:.6f} {y2:.6f} {' '.join(parts[5:])}\n")
 
 # Get a list of all txt files in the result directory
-txt_files = glob.glob('./result/track6/labels_xyxy/*.txt')
+txt_files = glob.glob('./result/track8/labels/*.txt')
 
 # Convert the bounding boxes in all txt files
 for txt_file in txt_files:

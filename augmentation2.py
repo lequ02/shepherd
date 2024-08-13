@@ -57,7 +57,7 @@ fps = video_capture.get(cv2.CAP_PROP_FPS)
 
 frame_width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
 frame_height = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-output_video = cv2.VideoWriter('output_video4_noresize.avi', cv2.VideoWriter_fourcc(*'XVID'), fps, (frame_width, frame_height))
+output_video = cv2.VideoWriter('output_video4.avi', cv2.VideoWriter_fourcc(*'XVID'), fps, (frame_width, frame_height))
 
 # Define codec and create VideoWriter object
 # fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # or use 'FMP4'

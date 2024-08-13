@@ -4,10 +4,13 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics import pairwise_distances
 import re
+import shutil
+
 
 # Directory containing the files
-ori_directory = "result\\track6 - Copy\\labels_xyxy\\"
-reid_dir = "result\\track6 - Copy\\reID\\"
+ori_directory = "result\\track8\\labels\\"
+reid_dir = "result\\track8\\reID\\"
+
 
 files = [f for f in os.listdir(ori_directory) if f.startswith("output_video4_") and f.endswith(".txt")]
 title = ["label", "xtop", "ytop", "xbot", "ybot", "id"]
@@ -17,9 +20,6 @@ def map_id_cos_sim(cos_sim_matrix, lost_track1, lost_track2):
     id_mapping_dict_cos_sim = {}
 
     while not np.all(np.isinf(cos_sim_matrix)):
-        # print("\n",i)
-        # print(cos_sim)
-        # print("max cos sim" ,np.argmax(cos_sim))
         max_index = np.argmax(cos_sim_matrix)
         if np.argmax(cos_sim_matrix)>=0.999:
             max_row, max_col = np.unravel_index(max_index, cos_sim_matrix.shape)
@@ -33,10 +33,6 @@ def map_id_cos_sim(cos_sim_matrix, lost_track1, lost_track2):
     # when lost_track1 > lost_track2, that means there are obj(s) missing in frame2
     # return the object from frame1 that wasn't matched to frame2, to add that missing obj to the frame2 detections
 
-    # print(type(id_mapping_dict_cos_sim.values()), id_mapping_dict_cos_sim.values(), list(id_mapping_dict_cos_sim.values()) )
-    # missing_detections = lost_track1.id[~list(id_mapping_dict_cos_sim.values())]
-    # return id_mapping_dict_cos_sim, missing_detections
-
     # Create a list of unmapped rows
     unmapped_rows = lost_track1[~lost_track1['id'].isin(id_mapping_dict_cos_sim.values())]
     # Convert the list to a DataFrame
@@ -46,8 +42,6 @@ def map_id_cos_sim(cos_sim_matrix, lost_track1, lost_track2):
 
 def map_id_manhattan(distance_matrix, lost_track1, lost_track2):
     while not np.all(np.isinf(distance_matrix)):
-        # print(distance_matrix)
-        # print("min manhattan", np.argmin(distance_matrix))
         min_index = np.argmin(distance_matrix)
         min_row, min_col = np.unravel_index(min_index, distance_matrix.shape)
         id_mapping_manhattan[lost_track2.id.iloc[min_col]] = lost_track1.id.iloc[min_row]
@@ -55,9 +49,29 @@ def map_id_manhattan(distance_matrix, lost_track1, lost_track2):
         distance_matrix[min_row, :] = np.inf
         distance_matrix[:, min_col] = np.inf
 
+
+
+# Check if the reid_dir exists
+if not os.path.exists(reid_dir):
+    # If not, create the directory
+    os.makedirs(reid_dir)
+
+    #  Define the directories and files
+    ori_file = ori_directory + "output_video4_1.txt"
+    new_file = reid_dir + "output_video4_1_reID.txt"
+
+    # Then, copy ori_file and rename it to new_file
+    shutil.copy(ori_file, new_file)
+    print(f"{ori_file} is copied and renamed to {new_file}")
+else:
+    print(f"{reid_dir} already exists.")
+
+
+
+
 # Iterate over consecutive pairs of files
-# for i in range(1, len(files)):
-for i in range(1, 216):
+for i in range(1, len(files)):
+# for i in range(1, 216):
 
     prev_file_path = f"{reid_dir}output_video4_{i}_reID.txt"
     next_file_path = f"{ori_directory}output_video4_{i+1}.txt"
@@ -82,22 +96,13 @@ for i in range(1, 216):
     ids_in_next = df_prev['id'].isin(df_next['id'])
     lost_tracks_prev = df_prev[~ids_in_next]
 
-    # print("ids_in_next", ids_in_next)
 
-    print("1voi", lost_tracks_prev)
-    print("2cho", lost_tracks_next)
+    # print("1voi", lost_tracks_prev)
+    # print("2cho", lost_tracks_next)
     if not lost_tracks_prev.empty:
         if not lost_tracks_next.empty:
         # Compute mappings between lost tracks
-            cos_sim_matrix = pd.DataFrame(cosine_similarity(lost_tracks_prev.iloc[:, 1:-1], lost_tracks_next.iloc[:, 1:-1]))
-            # distance_matrix = pairwise_distances(lost_tracks_prev.iloc[:, 1:-1], lost_tracks_next.iloc[:, 1:-1], metric='manhattan')
-
-            # id_mapping_cos_sim = {}
-            # id_mapping_manhattan = {}
-
-            # map_id_cos_sim(cos_sim_matrix, id_mapping_cos_sim)
-            # map_id_manhattan(distance_matrix, id_mapping_manhattan)
-            
+            cos_sim_matrix = pd.DataFrame(cosine_similarity(lost_tracks_prev.iloc[:, 1:-1], lost_tracks_next.iloc[:, 1:-1]))         
             id_mapping_dict_cos_sim, missing_detections = map_id_cos_sim(cos_sim_matrix, lost_tracks_prev, lost_tracks_next)
             # map_id_manhattan(distance_matrix, lost_tracks_prev, lost_tracks_next)
             print("id_dict", type(id_mapping_dict_cos_sim), id_mapping_dict_cos_sim)
@@ -117,10 +122,6 @@ for i in range(1, 216):
             df_next['id'] = df_next['id'].astype(int)
 
 
-
-
-            # df_next.loc['id'] = df_next['id'].map(id_mapping_cos_sim)
-            # df_next['id'] = df_next['id'].map(id_mapping_manhattan)
             print("missing", missing_detections)
 
             print("finale", df_next)
@@ -131,9 +132,8 @@ for i in range(1, 216):
             break
 
     # Write to new file
-    output_file = f"result\\track6 - Copy\\reID\\output_video4_{i+1}_reID.txt"
+    output_file = f"result\\track8\\reID\\output_video4_{i+1}_reID.txt"
     print(output_file)
     with open(output_file, 'w') as f:
         f.write(df_next.to_csv(index=False, sep=" ", header=False))
-    # print("conmeo")
 print("All files processed.")
