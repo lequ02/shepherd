@@ -9,6 +9,9 @@ from sklearn.metrics import pairwise_distances
 
 
 def convert_coords(coords: list):
+    """
+    Convert augment_and_resize_frame(frame) coordinates to original frame coordinates
+    """
     x_min, y_min, x_max, y_max = coords
     y_min, y_max = y_min * 1.35625, y_max * 1.35625
     x_min, x_max = x_min * 3.35, x_max * 3.35
@@ -18,6 +21,10 @@ def convert_coords(coords: list):
 def resolve_lost_tracks(
     lost_tracks_prev: dict, lost_tracks_next: dict, metric: str = "cosine"
 ):
+    """
+    Function to resolve lost tracks between two frames using cosine similarity or manhattan distance
+    Map the lost tracks IDs from the previous frame to the next frame based on the similarity metric
+    """
     prev_id_to_next_id = dict()
 
     if metric == "cosine":
@@ -110,7 +117,7 @@ def adam_tracking_v2(
         input_video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
 
         _, original_next_frame = input_video.read()
-
+        # augment, resize the frame before passing to obj detection so it is in the same format as the training data
         next_frame = augment_and_resize_frame(original_next_frame, augment=augment)
 
         results = model.track(
@@ -132,7 +139,7 @@ def adam_tracking_v2(
         next_frame_predictions = {
             k: next_frame_predictions[k] for k in sorted(next_frame_predictions)
         }
-
+        # in next_frame, if id>32, it is a lost track, because there are only 32 sheep in the pen
         lost_tracks_next = {
             id: coords for id, coords in next_frame_predictions.items() if id > 32
         }
@@ -141,14 +148,14 @@ def adam_tracking_v2(
             for id, coords in prev_frame_predictions.items()
             if id not in lost_tracks_next.keys()
         }
-
+        # Map lost tracks from previous frame to next frame
         if lost_tracks_next and lost_tracks_prev:
             prev_id_to_next_id = resolve_lost_tracks(
                 lost_tracks_prev, lost_tracks_next, metric=resolve_metric
             )
             for prev_id, next_id in prev_id_to_next_id.items():
                 next_frame_predictions[prev_id] = next_frame_predictions.pop(next_id)
-
+        # Calculate distances between the same IDs in the previous and next frame
         for id in list(
             set(next_frame_predictions.keys()).intersection(
                 set(prev_frame_predictions.keys())
@@ -203,9 +210,9 @@ if __name__ == "__main__":
     adam_tracking_v2(
         model_path="./sheep_tracking/models/best.pt",
         input_video_path="./sheep_tracking/input_videos/natural/sheeps_30sec.mp4",
-        output_video_path="./sheep_tracking/output_videos/test_no_distances.mp4",
+        output_video_path="./sheep_tracking/output_videos/test_dummy.mp4",
         augment=True,
-        display_distances=False,
+        display_distances=True,
         verbose=True,
         resolve_metric="manhattan",
     )
